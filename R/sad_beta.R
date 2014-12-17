@@ -1,25 +1,34 @@
-#####################################
-#START FUNCTION #####################
-#####################################
-
-sad.beta <- function(spp.count, Nsamp, Nplot = 16,  Nsite = 9, dist = "qlnorm", method = 'bray', 
+#' short description of what function does
+#' 
+#' much longer description of what function does
+#' 
+#' @param spp.count number of species to use in simulation
+#' @param Nsamp number of individuals to sample in each plot 
+#' @param Nplot number of 'plots' sampled per round
+#' @param Nsite number of 'sites' to sample, essentially number of simulations to run
+#' @param dist distribution to use for calculating RAD
+#' @param method beta measurement used
+#' @param gamma.step integer for stepwise increase of gamma with each progressive site sampled
+#' @param radplot Logical. If TRUE RAD plot will be generated
+#' @param betaplot Logical. If TRUE beta plot will be generated
+#' @param csvoutput Logical. If TRUE the entire data set is exported into .csv in working directory
+#' @return describe output of function
+#' @author Ross Whippo
+#' @examples 
+#' #description of examples here
+#' #actual R code to execute examples
+#' @export 
+#' @importFrom VGAM pzipf
+#' @importFrom gtools mixedsort
+#' @import vegan
+#' 
+sad_beta <- function(spp.count, Nsamp, Nplot = 16,  Nsite = 9, dist = "qlnorm", method = 'bray', 
                      gamma.step = 0, radplot = TRUE, betaplot = TRUE, csvoutput = TRUE) 
-  #spp.count = number of species to use in simulation
-  #Nplot = number of 'plots' sampled per round
-  #Nsamp = number of individuals to sample in each plot
-  #Nplot = number of 'plots' to sample per round
-  #dist = distribution to use for calculating RAD
-  #method = beta measurement used
-  #Nsite = number of 'sites' to sample, essentially number of simulations to run
-  #gamma.step = integer for stepwise increase of gamma with each progressive site sampled
-  #radplot = Logical. If TRUE RAD plot will be generated
-  #betaplot = Logical. If TRUE beta plot will be generated
-  #csvoutput = Logical. If TRUE the entire data set is exported into .csv
 {
   
-  require(VGAM) #provides Zipf-Mandelbrot distribution
-  require(gtools) #allows sorting of matrices (may not be necessary for front end use)
-  require(vegan) #for beta diversity analysis
+  #require(VGAM) #provides Zipf-Mandelbrot distribution
+  #require(gtools) #allows sorting of matrices (may not be necessary for front end use)
+  #require(vegan) #for beta diversity analysis
   
   #built-in function to determine if number is integer (needed for zipf)
   is.wholenumber <- function(x, tol = .Machine$double.eps^0.5)  abs(x - round(x)) < tol
@@ -77,7 +86,7 @@ sad.beta <- function(spp.count, Nsamp, Nplot = 16,  Nsite = 9, dist = "qlnorm", 
       samecols <- intersect(colnames(comm.mat), colnames(comm)) #vector to align column names between matrices
       comm.mat <- merge(comm.mat,comm, by = samecols, all =TRUE) #put draws into matrix 
     }
-    #colnames(comm.mat) <- mixedsort(colnames(comm.mat)) #reorders columns by species ID
+    colnames(comm.mat) <- mixedsort(colnames(comm.mat)) #reorders columns by species ID
     comm.mat[is.na(comm.mat)] <- 0 #replace NAs with 0
     newcols <- seq(1,(spp.count + (gamma.step * Nsite)), 1) #vector to align column names between matrices
     newcols <- as.character(newcols) #make numeric vector into characters
@@ -127,7 +136,7 @@ sad.beta <- function(spp.count, Nsamp, Nplot = 16,  Nsite = 9, dist = "qlnorm", 
     lines(1:(spp.count + (gamma.step * Nsite)), rad.means[3,], lwd = 2)
     lines(1:(spp.count + (gamma.step * Nsite)), rad.means[4,], lty = 2)
     lines(1:(spp.count + (gamma.step * Nsite)), rad.means[2,], lty = 2)
-  }
+    }
   
   if (betaplot == TRUE){
     if (meth %in% c(1, 4)){
@@ -135,16 +144,16 @@ sad.beta <- function(spp.count, Nsamp, Nplot = 16,  Nsite = 9, dist = "qlnorm", 
       colnames(beta.result) <- 1:Nsite
       rownames(beta.result) <- rownames(rad.means)
       boxplot(t(beta.mat), xlab = "Site(simulation) #", ylab = c(dQuote(inm),"distance to centroid"))
-    } 
-    
+      } 
+  
     if (meth %in% c(2,3)){
       beta.result <- as.matrix(beta.mat[,1])
       plot(beta.result, cex = 2, type = 'p', pch = 15, xlab = "Site(simulation) #", ylab = c(dQuote(inm),"beta"))
-    }
+      }
   }
   
   if (csvoutput == TRUE)
-    write.csv(total.comm, file = "TotalComm.csv")
+  write.csv(total.comm, file = "TotalComm.csv")
   
   #results <- c(rad.means, beta.result)
   #return(results)
@@ -168,3 +177,4 @@ sad.beta <- function(spp.count, Nsamp, Nplot = 16,  Nsite = 9, dist = "qlnorm", 
 ###########beta should display grand mean as well as  mean w/in each site
 ###########can I use the qzipf function (proprietary? credit?)?
 ###########what is 's' in qzipf?
+
