@@ -22,7 +22,7 @@
 #' @export 
 #' @importFrom VGAM pzipf
 #' @importFrom gtools mixedsort
-#' @import vegan vegdist 
+#' @importFrom vegan vegdist 
 #' 
 sad_beta <- function(spp_count, Nsamp, Nplot = 16,  Nsite = 9, dist = "qlnorm", method = 'bray', 
                      gamma_step = 0, radplot = TRUE, betaplot = TRUE, csvoutput = FALSE) 
