@@ -3,30 +3,28 @@
 \alias{saDist}
 \docType{package}
 \title{
-What the package does (short line)
-~~ package title ~~
+Species Area Distribution Null Models and Visualization
 }
 \description{
-More about what it does (maybe more than one line)
-~~ A concise (1-5 lines) description of the package ~~
+The saDist package was created to do really awesome things.  
 }
 \details{
 \tabular{ll}{
 Package: \tab saDist\cr
 Type: \tab Package\cr
-Version: \tab 1.0\cr
+Version: \tab 0.1.0\cr
 Date: \tab 2014-12-17\cr
-License: \tab What license is it under?\cr
+License: \tab MIT\cr
 }
 ~~ An overview of how to use the package, including the most important functions ~~
 }
 \author{
-Who wrote it
+Ross Whippo
 
-Maintainer: Who to complain to <yourfault@somewhere.net>
-~~ The author and/or maintainer of the package ~~
+Maintainer: Ross Whippo <rosspitality@gmail.com>
 }
 \references{
+Kraft et al. 2011
 ~~ Literature or other references for background information ~~
 }
 ~~ Optionally other standard keywords, one per line, from file KEYWORDS in the R documentation ~~
