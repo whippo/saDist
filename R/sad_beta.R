@@ -1,6 +1,8 @@
-#' short description of what function does
+#' RAD and Beta Diversity Null Models
 #' 
-#' much longer description of what function does
+#' This function randomly populates community matrices from various species abundance distributions (SADs),
+#' based on input parameters chosen by the user. Possbile outputs include rank abundance distribution (RAD)
+#' plots, beta diversity plots, RAD quartiles, and a .csv of all permuted communities. 
 #' 
 #' @param spp_count number of species to use in simulation
 #' @param Nsamp number of individuals to sample in each plot 
