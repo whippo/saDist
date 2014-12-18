@@ -2,14 +2,14 @@
 % Please edit documentation in R/sad_beta.R
 \name{sad_beta}
 \alias{sad_beta}
-\title{short description of what function does}
+\title{RAD and Beta Diversity Null Models}
 \usage{
-sad_beta(spp.count, Nsamp, Nplot = 16, Nsite = 9, dist = "qlnorm",
-  method = "bray", gamma.step = 0, radplot = TRUE, betaplot = TRUE,
-  csvoutput = TRUE)
+sad_beta(spp_count, Nsamp, Nplot = 16, Nsite = 9, dist = "qlnorm",
+  method = "bray", gamma_step = 0, radplot = TRUE, betaplot = TRUE,
+  csvoutput = FALSE)
 }
 \arguments{
-\item{spp.count}{number of species to use in simulation}
+\item{spp_count}{number of species to use in simulation}
 
 \item{Nsamp}{number of individuals to sample in each plot}
 
@@ -21,7 +21,7 @@ sad_beta(spp.count, Nsamp, Nplot = 16, Nsite = 9, dist = "qlnorm",
 
 \item{method}{beta measurement used}
 
-\item{gamma.step}{integer for stepwise increase of gamma with each progressive site sampled}
+\item{gamma_step}{integer for stepwise increase of gamma with each progressive site sampled}
 
 \item{radplot}{Logical. If TRUE RAD plot will be generated}
 
@@ -33,7 +33,9 @@ sad_beta(spp.count, Nsamp, Nplot = 16, Nsite = 9, dist = "qlnorm",
 describe output of function
 }
 \description{
-much longer description of what function does
+This function randomly populates community matrices from various species abundance distributions (SADs),
+based on input parameters chosen by the user. Possbile outputs include rank abundance distribution (RAD)
+plots, beta diversity plots, RAD quartiles, and a .csv of all permuted communities.
 }
 \examples{
 #description of examples here
