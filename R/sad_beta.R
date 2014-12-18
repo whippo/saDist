@@ -2,13 +2,13 @@
 #' 
 #' much longer description of what function does
 #' 
-#' @param spp.count number of species to use in simulation
+#' @param spp_count number of species to use in simulation
 #' @param Nsamp number of individuals to sample in each plot 
 #' @param Nplot number of 'plots' sampled per round
 #' @param Nsite number of 'sites' to sample, essentially number of simulations to run
 #' @param dist distribution to use for calculating RAD
 #' @param method beta measurement used
-#' @param gamma.step integer for stepwise increase of gamma with each progressive site sampled
+#' @param gamma_step integer for stepwise increase of gamma with each progressive site sampled
 #' @param radplot Logical. If TRUE RAD plot will be generated
 #' @param betaplot Logical. If TRUE beta plot will be generated
 #' @param csvoutput Logical. If TRUE the entire data set is exported into .csv in working directory
@@ -22,8 +22,8 @@
 #' @importFrom gtools mixedsort
 #' @import vegan
 #' 
-sad_beta <- function(spp.count, Nsamp, Nplot = 16,  Nsite = 9, dist = "qlnorm", method = 'bray', 
-                     gamma.step = 0, radplot = TRUE, betaplot = TRUE, csvoutput = TRUE) 
+sad_beta <- function(spp_count, Nsamp, Nplot = 16,  Nsite = 9, dist = "qlnorm", method = 'bray', 
+                     gamma_step = 0, radplot = TRUE, betaplot = TRUE, csvoutput = FALSE) 
 {
   
   #require(VGAM) #provides Zipf-Mandelbrot distribution
@@ -55,20 +55,20 @@ sad_beta <- function(spp.count, Nsamp, Nplot = 16,  Nsite = 9, dist = "qlnorm", 
   if (is.na(dist))
     stop("invalid distribution")
   
-  rad.totals <- matrix(0, length(1:Nsite), length(1:(spp.count + (gamma.step * Nsite)))) #matrix to hold colsums for each round
-  total.comm <- matrix(0, 0, length(1:(spp.count + (gamma.step * Nsite)))) #matrix to hold ALL samples
-  colnames(total.comm) <- c(1:(spp.count + (gamma.step * Nsite))) #rename columns to match species count
-  colnames(rad.totals) <- c(1:(spp.count + (gamma.step * Nsite))) #rename columns to match species count
+  rad.totals <- matrix(0, length(1:Nsite), length(1:(spp_count + (gamma_step * Nsite)))) #matrix to hold colsums for each round
+  total.comm <- matrix(0, 0, length(1:(spp_count + (gamma_step * Nsite)))) #matrix to hold ALL samples
+  colnames(total.comm) <- c(1:(spp_count + (gamma_step * Nsite))) #rename columns to match species count
+  colnames(rad.totals) <- c(1:(spp_count + (gamma_step * Nsite))) #rename columns to match species count
   beta.mat <- matrix(0, length(1:Nsite), 5) #matrix to hold beta values for each round
   for (i in 1:Nsite) #loop for populating abundance matrix and beta measurements
   {
-    comm.mat <- matrix(0, 0, length(1:(spp.count + (gamma.step * Nsite)))) #empty matrix to populate with draws
-    colnames(comm.mat) <- c(1:(spp.count + (gamma.step * Nsite))) #rename matrix columns for ease of reading
+    comm.mat <- matrix(0, 0, length(1:(spp_count + (gamma_step * Nsite)))) #empty matrix to populate with draws
+    colnames(comm.mat) <- c(1:(spp_count + (gamma_step * Nsite))) #rename matrix columns for ease of reading
     for(j in 1:Nplot) #loop for plot sampling
     {
-      sp <-   (1:(spp.count + ((gamma.step * i) - gamma.step))) #vector of species observed
-      quantile_vect <- seq(0, 1, length.out = (spp.count + ((gamma.step * i) - gamma.step) + 2)) #evenly spaced sequence of numbers 0>n>1
-      quantile_vect <- quantile_vect[2:(spp.count + ((gamma.step * i) - gamma.step) +1 )] #evenly spaced draws from distribution
+      sp <-   (1:(spp_count + ((gamma_step * i) - gamma_step))) #vector of species observed
+      quantile_vect <- seq(0, 1, length.out = (spp_count + ((gamma_step * i) - gamma_step) + 2)) #evenly spaced sequence of numbers 0>n>1
+      quantile_vect <- quantile_vect[2:(spp_count + ((gamma_step * i) - gamma_step) +1 )] #evenly spaced draws from distribution
       
       if (dist == 1) #conditional, determine abundance from log normal dist
         abundance <- qlnorm(quantile_vect)
@@ -88,7 +88,7 @@ sad_beta <- function(spp.count, Nsamp, Nplot = 16,  Nsite = 9, dist = "qlnorm", 
     }
     colnames(comm.mat) <- mixedsort(colnames(comm.mat)) #reorders columns by species ID
     comm.mat[is.na(comm.mat)] <- 0 #replace NAs with 0
-    newcols <- seq(1,(spp.count + (gamma.step * Nsite)), 1) #vector to align column names between matrices
+    newcols <- seq(1,(spp_count + (gamma_step * Nsite)), 1) #vector to align column names between matrices
     newcols <- as.character(newcols) #make numeric vector into characters
     total.comm <- merge(total.comm, comm.mat, by = newcols, all = TRUE)  #add all draws to master matrix
     comm.cols <- colSums(comm.mat) #sum species totals for site[i]
@@ -112,7 +112,7 @@ sad_beta <- function(spp.count, Nsamp, Nplot = 16,  Nsite = 9, dist = "qlnorm", 
       comm.mat[comm.mat > 0] <- 1
       beta.dist <- apply(comm.mat, 1, sum)
       beta.mean <- mean(beta.dist)  
-      beta.value <- (spp.count + (gamma.step*i)/beta.mean)
+      beta.value <- (spp_count + (gamma_step*i)/beta.mean)
       beta.mat[i,1] <- beta.value
     }
     
@@ -120,7 +120,7 @@ sad_beta <- function(spp.count, Nsamp, Nplot = 16,  Nsite = 9, dist = "qlnorm", 
       comm.mat[comm.mat > 0] <- 1
       beta.dist <- apply(comm.mat, 1, sum)
       beta.mean <- mean(beta.dist)  
-      beta.value <- (spp.count + (gamma.step*i) - beta.mean)
+      beta.value <- (spp_count + (gamma_step*i) - beta.mean)
       beta.mat[i,1] <- beta.value
     }
     if (meth == 4){
@@ -132,10 +132,10 @@ sad_beta <- function(spp.count, Nsamp, Nplot = 16,  Nsite = 9, dist = "qlnorm", 
   
   if (radplot == TRUE){
     rad.means <- apply(rad.totals, 2, quantile)
-    plot(1:(spp.count + (gamma.step * Nsite)), rad.means[4,], type = 'n', xlab = "Rank", ylab = "Mean Abundance", main = dQuote(ind))
-    lines(1:(spp.count + (gamma.step * Nsite)), rad.means[3,], lwd = 2)
-    lines(1:(spp.count + (gamma.step * Nsite)), rad.means[4,], lty = 2)
-    lines(1:(spp.count + (gamma.step * Nsite)), rad.means[2,], lty = 2)
+    plot(1:(spp_count + (gamma_step * Nsite)), rad.means[4,], type = 'n', xlab = "Rank", ylab = "Mean Abundance", main = dQuote(ind))
+    lines(1:(spp_count + (gamma_step * Nsite)), rad.means[3,], lwd = 2)
+    lines(1:(spp_count + (gamma_step * Nsite)), rad.means[4,], lty = 2)
+    lines(1:(spp_count + (gamma_step * Nsite)), rad.means[2,], lty = 2)
     }
   
   if (betaplot == TRUE){
@@ -163,7 +163,7 @@ sad_beta <- function(spp.count, Nsamp, Nplot = 16,  Nsite = 9, dist = "qlnorm", 
 
 
 #values for manual testing of function:
-#spp.count = 40
+#spp_count = 40
 #Nsamp = 100
 #Nplot = 16
 #Nsite = 10
