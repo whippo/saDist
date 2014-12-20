@@ -27,8 +27,7 @@
 sad_beta <- function(spp_count, Nsamp, Nplot = 16,  Nsite = 9, dist = "qlnorm", method = 'bray', 
                      gamma_step = 0, radplot = TRUE, betaplot = TRUE, csvoutput = FALSE) 
 {
-  
-  DISTS <- c("qlnorm", "qgeom", "qzipf") #need to add log-series
+  DISTS <- c("qlnorm", "qgeom", "qzipf") 
   dist <- pmatch(dist, DISTS)
   ind <- DISTS[dist]
   if (is.na(dist))
@@ -56,7 +55,7 @@ sad_beta <- function(spp_count, Nsamp, Nplot = 16,  Nsite = 9, dist = "qlnorm", 
         abundance <- qgeom(quantile_vect, (1/length(sp)))
       
       if (dist == 3) #conditional, determine abundance from zipf dist
-        abundance <- qzipf(quantile_vect, length(sp), .5)
+        abundance <- qzipf(quantile_vect, length(sp), 1)
       
       probs <- abundance/sum(abundance) #converts abundance to probability
       probs <- rev(probs) #reverse order of probs to make sp 1 > sp 2 > sp 3....etc.
@@ -85,7 +84,6 @@ sad_beta <- function(spp_count, Nsamp, Nplot = 16,  Nsite = 9, dist = "qlnorm", 
       beta.quan <- quantile(beta.dist) #creates list of quartiles for sample
       beta.mat[i,] <- beta.quan
     }
-    #scores(beta.dist) #provides entire matrix of pairwise distances
     
     if (meth == 2){
       comm.mat[comm.mat > 0] <- 1
@@ -102,6 +100,7 @@ sad_beta <- function(spp_count, Nsamp, Nplot = 16,  Nsite = 9, dist = "qlnorm", 
       beta.value <- (spp_count + (gamma_step*i) - beta.mean)
       beta.mat[i,1] <- beta.value
     }
+    
     if (meth == 4){
       beta.dist <- vegdist(comm.mat, method = "altGower") #calculates altGower pairwise distances
       beta.quan <- quantile(beta.dist) #creates list of quartiles for sample
@@ -134,26 +133,6 @@ sad_beta <- function(spp_count, Nsamp, Nplot = 16,  Nsite = 9, dist = "qlnorm", 
   if (csvoutput == TRUE)
   write.csv(total.comm, file = "TotalComm.csv")
   
-  #results <- c(rad.means, beta.result)
-  #return(results)
   return(rad.means)
   
 } 
-
-
-#values for manual testing of function:
-#spp_count = 40
-#Nsamp = 100
-#Nplot = 16
-#Nsite = 10
-
-
-#####################################
-#END FUNCTION #######################
-#####################################
-
-#PROBLEMS: beta means are an average of averages
-###########beta should display grand mean as well as  mean w/in each site
-###########can I use the qzipf function (proprietary? credit?)?
-###########what is 's' in qzipf?
-
