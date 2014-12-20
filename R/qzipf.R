@@ -1,17 +1,3 @@
-#' Quantile of the Zipf distribution
-#' 
-#' This function generates quantiles from the Zipf distribution via the VGAM pzipf() function.
-#' 
-#' @param p vector of probabilities.
-#' @param N the number of elements.
-#' @param s the exponent characterizing the distribution
-#' @param logical; if TRUE (default), probabilities are P[X <= x], otherwise, P[X > x].
-#' @param log.p logical; if TRUE, probabilities p are given as log(p).
-#' @return describe output of function
-#' @author piklprado
-#' @examples 
-#' #description of examples here
-#' #actual R code to execute examples
 #' @importFrom VGAM pzipf
 #' 
 qzipf <- function(p, N, s, lower.tail = TRUE, log.p = FALSE){
