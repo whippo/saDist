@@ -24,8 +24,8 @@
 #' @importFrom gtools mixedsort
 #' @importFrom vegan vegdist 
 #' 
-sad_beta <- function(spp_count, Nsamp, Nplot = 16,  Nsite = 9, dist = "qlnorm", method = 'bray', 
-                     gamma_step = 0, radplot = TRUE, betaplot = TRUE, csvoutput = FALSE) 
+sad_beta <- function(spp_count, Nsamp, Nplot = 16,  Nsite = 9, dist = "qlnorm", #method = 'bray', 
+                     gamma_step = 0) #radplot = TRUE, betaplot = TRUE, csvoutput = FALSE) 
 {
   DISTS <- c("qlnorm", "qgeom", "qzipf") 
   dist <- pmatch(dist, DISTS)
@@ -37,7 +37,7 @@ sad_beta <- function(spp_count, Nsamp, Nplot = 16,  Nsite = 9, dist = "qlnorm", 
   total.comm <- matrix(0, 0, length(1:(spp_count + (gamma_step * Nsite)))) #matrix to hold ALL samples
   colnames(total.comm) <- c(1:(spp_count + (gamma_step * Nsite))) #rename columns to match species count
   colnames(rad.totals) <- c(1:(spp_count + (gamma_step * Nsite))) #rename columns to match species count
-  beta.mat <- matrix(0, length(1:Nsite), 5) #matrix to hold beta values for each round
+  #beta.mat <- matrix(0, length(1:Nsite), 5) #matrix to hold beta values for each round
   for (i in 1:Nsite) #loop for populating abundance matrix and beta measurements
   {
     comm.mat <- matrix(0, 0, length(1:(spp_count + (gamma_step * Nsite)))) #empty matrix to populate with draws
@@ -64,75 +64,85 @@ sad_beta <- function(spp_count, Nsamp, Nplot = 16,  Nsite = 9, dist = "qlnorm", 
       samecols <- intersect(colnames(comm.mat), colnames(comm)) #vector to align column names between matrices
       comm.mat <- merge(comm.mat,comm, by = samecols, all =TRUE) #put draws into matrix 
     }
-    colnames(comm.mat) <- mixedsort(colnames(comm.mat)) #reorders columns by species ID
+    comm.mat <- comm.mat[,sort.list(as.numeric(colnames(comm.mat)))] #reorders columns by species ID
     comm.mat[is.na(comm.mat)] <- 0 #replace NAs with 0
-    newcols <- seq(1,(spp_count + (gamma_step * Nsite)), 1) #vector to align column names between matrices
-    newcols <- as.character(newcols) #make numeric vector into characters
-    total.comm <- merge(total.comm, comm.mat, by = newcols, all = TRUE)  #add all draws to master matrix
+    #newcols <- seq(1,(spp_count + (gamma_step * Nsite)), 1) #vector to align column names between matrices
+    #newcols <- as.character(newcols) #make numeric vector into characters
+    #total.comm <- merge(total.comm, comm.mat, by = newcols, all = TRUE)  #add all draws to master matrix
     comm.cols <- colSums(comm.mat) #sum species totals for site[i]
     comm.cols <- t(as.matrix(comm.cols)) #turn sums into matrix
     rad.totals[i,] <- comm.cols #add summed species abund totals to site matrix
     
-    METH <- c("bray", "whittaker", "additive", "altGower")
-    meth <- pmatch(method, METH)
-    inm <- METH[meth]
-    if (is.na(method))
-      stop("invalid method")
+    #METH <- c("bray", "whittaker", "additive", "altGower")
+    #meth <- pmatch(method, METH)
+    #inm <- METH[meth]
+    #if (is.na(method))
+    #  stop("invalid method")
     
-    if (meth == 1){
-      beta.dist <- vegdist(comm.mat, method = "bray") #calculates bray curtis pairwise distances
-      beta.quan <- quantile(beta.dist) #creates list of quartiles for sample
-      beta.mat[i,] <- beta.quan
-    }
+    #if (meth == 1){
+    #  beta.dist <- vegdist(comm.mat, method = "bray") #calculates bray curtis pairwise distances
+    #  beta.quan <- quantile(beta.dist) #creates list of quartiles for sample
+    #  beta.mat[i,] <- beta.quan
+    #}
     
-    if (meth == 2){
-      comm.mat[comm.mat > 0] <- 1
-      beta.dist <- apply(comm.mat, 1, sum)
-      beta.mean <- mean(beta.dist)  
-      beta.value <- (spp_count + (gamma_step*i)/beta.mean)
-      beta.mat[i,1] <- beta.value
-    }
+    #if (meth == 2){
+    #  comm.mat[comm.mat > 0] <- 1
+    #  beta.dist <- apply(comm.mat, 1, sum)
+    #  beta.mean <- mean(beta.dist)  
+    #  beta.value <- (spp_count + (gamma_step*i)/beta.mean)
+    #  beta.mat[i,1] <- beta.value
+    #}
     
-    if (meth == 3){
-      comm.mat[comm.mat > 0] <- 1
-      beta.dist <- apply(comm.mat, 1, sum)
-      beta.mean <- mean(beta.dist)  
-      beta.value <- (spp_count + (gamma_step*i) - beta.mean)
-      beta.mat[i,1] <- beta.value
-    }
+    #if (meth == 3){
+    #  comm.mat[comm.mat > 0] <- 1
+    #  beta.dist <- apply(comm.mat, 1, sum)
+    #  beta.mean <- mean(beta.dist)  
+    #  beta.value <- (spp_count + (gamma_step*i) - beta.mean)
+    #  beta.mat[i,1] <- beta.value
+    #}
     
-    if (meth == 4){
-      beta.dist <- vegdist(comm.mat, method = "altGower") #calculates altGower pairwise distances
-      beta.quan <- quantile(beta.dist) #creates list of quartiles for sample
-      beta.mat[i,] <- beta.quan
-    }
+    #if (meth == 4){
+    #  beta.dist <- vegdist(comm.mat, method = "altGower") #calculates altGower pairwise distances
+    #  beta.quan <- quantile(beta.dist) #creates list of quartiles for sample
+    #  beta.mat[i,] <- beta.quan
+    #}
   }
   
-  if (radplot == TRUE){
-    rad.means <- apply(rad.totals, 2, quantile)
-    plot(1:(spp_count + (gamma_step * Nsite)), rad.means[4,], type = 'n', xlab = "Rank", ylab = "Mean Abundance", main = dQuote(ind))
-    lines(1:(spp_count + (gamma_step * Nsite)), rad.means[3,], lwd = 2)
-    lines(1:(spp_count + (gamma_step * Nsite)), rad.means[4,], lty = 2)
-    lines(1:(spp_count + (gamma_step * Nsite)), rad.means[2,], lty = 2)
-    }
+  colnames(rad.totals) <- c(as.numeric(1:(spp_count + (gamma_step * Nsite)))) #rename matrix columns for ease of reading
+  rad.quantiles <- apply(rad.totals, 2, quantile)
+  rad.means <- apply(rad.totals, 2, mean)
+  new.rad <- rbind(rad.means, sp)
+  plot(new.rad[1, ] ~ new.rad[2,])
+  rad.lm <- lm(new.rad[1, ] ~ new.rad[2,])
+  abline(rad.lm)
   
-  if (betaplot == TRUE){
-    if (meth %in% c(1, 4)){
-      beta.result <- t(beta.mat)
-      colnames(beta.result) <- 1:Nsite
-      rownames(beta.result) <- rownames(rad.means)
-      boxplot(t(beta.mat), xlab = "Site(simulation) #", ylab = c(dQuote(inm),"distance to centroid"))
-      } 
   
-    if (meth %in% c(2,3)){
-      beta.result <- as.matrix(beta.mat[,1])
-      plot(beta.result, cex = 2, type = 'p', pch = 15, xlab = "Site(simulation) #", ylab = c(dQuote(inm),"beta"))
-      }
-  }
+  #if (radplot == TRUE){
+  #  rad.means <- apply(rad.totals, 2, quantile)
+  #  plot(1:(spp_count + (gamma_step * Nsite)), rad.means[4,], type = 'n', xlab = "Rank", ylab = "Mean Abundance", main = dQuote(ind))
+  #  lines(1:(spp_count + (gamma_step * Nsite)), rad.means[3,], lwd = 2)
+  #  lines(1:(spp_count + (gamma_step * Nsite)), rad.means[4,], lty = 2)
+  #  lines(1:(spp_count + (gamma_step * Nsite)), rad.means[2,], lty = 2)
+  #  }
   
-  if (csvoutput == TRUE)
-  write.csv(total.comm, file = "TotalComm.csv")
+  #if (betaplot == TRUE){
+  #  if (meth %in% c(1, 4)){
+  #    beta.result <- t(beta.mat)
+  #    colnames(beta.result) <- 1:Nsite
+  #    rownames(beta.result) <- rownames(rad.means)
+  #    boxplot(t(beta.mat), xlab = "Site(simulation) #", ylab = c(dQuote(inm),"distance to centroid"))
+  #    } 
   
+#    if (meth %in% c(2,3)){
+#      beta.result <- as.matrix(beta.mat[,1])
+#      plot(beta.result, cex = 2, type = 'p', pch = 15, xlab = "Site(simulation) #", ylab = c(dQuote(inm),"beta"))
+#      }
+#  }
+#  
+#  if (csvoutput == TRUE)
+#  write.csv(total.comm, file = "TotalComm.csv")
+#  
+  results <- c(rad.means, rad.quantiles)
   return(rad.means)
   
 } 
