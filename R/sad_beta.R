@@ -19,7 +19,7 @@
 #' 
 sad_beta <- function(spp_count, Nsamp, Nplot = 16,  Nsite = 9, dist = "qlnorm", gamma_step = 0)
 {
-  DISTS <- c("qlnorm", "qgeom", "qzipf") 
+  DISTS <- c("qlnorm", "qzipf") 
   dist <- pmatch(dist, DISTS)
   ind <- DISTS[dist]
   if (is.na(dist))
@@ -43,10 +43,7 @@ sad_beta <- function(spp_count, Nsamp, Nplot = 16,  Nsite = 9, dist = "qlnorm", 
       if (dist == 1) #conditional, determine abundance from log normal dist
         abundance <- qlnorm(quantile_vect)
       
-      if (dist == 2) #conditional, determine abundance from geometric dist
-        abundance <- qgeom(quantile_vect, (1/length(sp)))
-      
-      if (dist == 3) #conditional, determine abundance from zipf dist
+      if (dist == 2) #conditional, determine abundance from zipf dist
         abundance <- qzipf(quantile_vect, length(sp), 1)
       
       probs <- abundance/sum(abundance) #converts abundance to probability
@@ -66,8 +63,8 @@ sad_beta <- function(spp_count, Nsamp, Nplot = 16,  Nsite = 9, dist = "qlnorm", 
   rad.quantiles <- apply(rad.totals, 2, quantile)
   rad.means <- apply(rad.totals, 2, mean)
   new.rad <- rbind(rad.means, sp)
-  plot(log(new.rad[1, ]) ~ new.rad[2,], xlab = "spp", ylab = "log abundance")
-  rad.lm <- lm(log(new.rad[1, ]) ~ new.rad[2,])
+  plot(log10(new.rad[1, ]) ~ new.rad[2,], xlab = "spp", ylab = "log abundance")
+  rad.lm <- lm(log10(new.rad[1, ]) ~ new.rad[2,])
   lm.summ <- summary(rad.lm)
   abline(rad.lm)
   
