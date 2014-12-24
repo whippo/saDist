@@ -7,9 +7,9 @@
 \title{Use species area distributions to create null models.}
 \description{
 saDist allows you to parameterize null models from different species abundance distributions.
-It also provides visualization and anlaysis options.
+It also provides anlaysis options.
 }
 \details{
-The only function available for this version of saDist is the sad_beta function.
+The only function available for this version of saDist is the sad_rad function.
 }
 

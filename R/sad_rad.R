@@ -17,7 +17,7 @@
 #' @export 
 #' @importFrom VGAM pzipf
 #' 
-sad_beta <- function(spp_count, Nsamp, Nplot = 16,  Nsite = 9, dist = "qlnorm", gamma_step = 0)
+sad_rad <- function(spp_count, Nsamp, Nplot = 16,  Nsite = 9, dist = "qlnorm")
 {
   DISTS <- c("qlnorm", "qzipf") 
   dist <- pmatch(dist, DISTS)
@@ -25,20 +25,20 @@ sad_beta <- function(spp_count, Nsamp, Nplot = 16,  Nsite = 9, dist = "qlnorm", 
   if (is.na(dist))
     stop("invalid distribution")
   
-  rad.totals <- matrix(0, length(1:Nsite), length(1:(spp_count + (gamma_step * Nsite)))) #matrix to hold colsums for each round
-  total.comm <- matrix(0, 0, length(1:(spp_count + (gamma_step * Nsite)))) #matrix to hold ALL samples
-  colnames(total.comm) <- c(1:(spp_count + (gamma_step * Nsite))) #rename columns to match species count
-  colnames(rad.totals) <- c(1:(spp_count + (gamma_step * Nsite))) #rename columns to match species count
+  rad.totals <- matrix(0, length(1:Nsite), length(1:(spp_count))) #matrix to hold colsums for each round
+  total.comm <- matrix(0, 0, length(1:(spp_count))) #matrix to hold ALL samples
+  colnames(total.comm) <- c(1:(spp_count)) #rename columns to match species count
+  colnames(rad.totals) <- c(1:(spp_count)) #rename columns to match species count
   #beta.mat <- matrix(0, length(1:Nsite), 5) #matrix to hold beta values for each round
   for (i in 1:Nsite) #loop for populating abundance matrix and beta measurements
   {
-    comm.mat <- matrix(0, 0, length(1:(spp_count + (gamma_step * Nsite)))) #empty matrix to populate with draws
-    colnames(comm.mat) <- c(1:(spp_count + (gamma_step * Nsite))) #rename matrix columns for ease of reading
+    comm.mat <- matrix(0, 0, length(1:(spp_count))) #empty matrix to populate with draws
+    colnames(comm.mat) <- c(1:(spp_count)) #rename matrix columns for ease of reading
     for(j in 1:Nplot) #loop for plot sampling
     {
-      sp <-   (1:(spp_count + ((gamma_step * i) - gamma_step))) #vector of species observed
-      quantile_vect <- seq(0, 1, length.out = (spp_count + ((gamma_step * i) - gamma_step) + 2)) #evenly spaced sequence of numbers 0>n>1
-      quantile_vect <- quantile_vect[2:(spp_count + ((gamma_step * i) - gamma_step) +1 )] #evenly spaced draws from distribution
+      sp <-   (1:(spp_count)) #vector of species observed
+      quantile_vect <- seq(0, 1, length.out = (spp_count + 2)) #evenly spaced sequence of numbers 0>n>1
+      quantile_vect <- quantile_vect[2:(spp_count  + 1)] #evenly spaced draws from distribution
       
       if (dist == 1) #conditional, determine abundance from log normal dist
         abundance <- qlnorm(quantile_vect)
@@ -59,7 +59,7 @@ sad_beta <- function(spp_count, Nsamp, Nplot = 16,  Nsite = 9, dist = "qlnorm", 
     comm.cols <- t(as.matrix(comm.cols)) #turn sums into matrix
     rad.totals[i,] <- comm.cols #add summed species abund totals to site matrix
   }
-  colnames(rad.totals) <- c(as.numeric(1:(spp_count + (gamma_step * Nsite)))) #rename matrix columns for ease of reading
+  colnames(rad.totals) <- c(as.numeric(1:(spp_count))) #rename matrix columns for ease of reading
   rad.quantiles <- apply(rad.totals, 2, quantile)
   rad.means <- apply(rad.totals, 2, mean)
   new.rad <- rbind(rad.means, sp)
